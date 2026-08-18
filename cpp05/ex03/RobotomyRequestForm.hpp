@@ -19,7 +19,7 @@ public:
     RobotomyRequestForm &operator=(const RobotomyRequestForm &other);
     virtual ~RobotomyRequestForm();
 
-    void action() const;
+    virtual void execute(const Bureaucrat &executor) const;
 };
 
 #endif

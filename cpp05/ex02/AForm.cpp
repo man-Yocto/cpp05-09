@@ -68,15 +68,6 @@ const char *AForm::FormNotSignedException::what() const throw()
     return "form is not signed";
 }
 
-void AForm::execute(const Bureaucrat &executor) const
-{
-    if (!this->isSigned)
-        throw FormNotSignedException();
-    if (executor.getGrade() > this->gradeToExecute)
-        throw GradeTooLowException();
-    this->action();
-}
-
 std::ostream &operator<<(std::ostream &os, const AForm &form)
 {
     os << form.getName()
