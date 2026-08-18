@@ -1,4 +1,5 @@
 #include "ScalarConverter.hpp"
+#include <iomanip>
 
 ScalarConverter::ScalarConverter() {}
 ScalarConverter::ScalarConverter(const ScalarConverter& other) { (void)other; }
@@ -118,6 +119,7 @@ static void printCharAndInt(double value)
 
 void printFromChar(char c)
 {
+    std::cout << std::fixed << std::setprecision(1);
     std::cout << "char: '" << c << "'" << std::endl;
     std::cout << "int: " << static_cast<int>(c) << std::endl;
     std::cout << "float: " << static_cast<float>(c) << "f" << std::endl;
@@ -133,20 +135,27 @@ void printFromInt(long value)
     else
         std::cout << "char: '" << static_cast<char>(value) << "'" << std::endl;
 
-    std::cout << "int: " << value << std::endl;
+    if (value < std::numeric_limits<int>::min() || value > std::numeric_limits<int>::max())
+        std::cout << "int: impossible" << std::endl;
+    else
+        std::cout << "int: " << value << std::endl;
+
+    std::cout << std::fixed << std::setprecision(1);
     std::cout << "float: " << static_cast<float>(value) << "f" << std::endl;
     std::cout << "double: " << static_cast<double>(value) << std::endl;
 }
 
 void printFromFloat(float value)
 {
-    printCharAndInt(value);
+    std::cout << std::fixed << std::setprecision(1);
+    printCharAndInt(static_cast<double>(value));
     std::cout << "float: " << value << "f" << std::endl;
     std::cout << "double: " << static_cast<double>(value) << std::endl;
 }
 
 void printFromDouble(double value)
 {
+    std::cout << std::fixed << std::setprecision(1);
     printCharAndInt(value);
     std::cout << "float: " << static_cast<float>(value) << "f" << std::endl;
     std::cout << "double: " << value << std::endl;
@@ -189,7 +198,8 @@ void ScalarConverter::convert(const std::string& literal)
     if (type == TYPE_INT)
     {
         long value = std::strtol(literal.c_str(), &end, 10);
-        if (errno == ERANGE || *end != '\0')
+        if (errno == ERANGE || *end != '\0' ||
+            value < std::numeric_limits<int>::min() || value > std::numeric_limits<int>::max())
             std::cout << "char: impossible\nint: impossible\nfloat: impossible\ndouble: impossible" << std::endl;
         else
             printFromInt(value);
