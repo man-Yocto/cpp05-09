@@ -1,4 +1,4 @@
-(NAME) = ex01
+NAME = ex01
 SRCS = main.cpp Span.cpp
 OBJS = $(SRCS:.cpp=.o)
 
