@@ -82,8 +82,7 @@ bool is_double(const std::string& literal)
 bool is_char(const std::string& literal)
 {
     return literal.length() == 1 &&
-           std::isprint(static_cast<unsigned char>(literal[0])) &&
-           !std::isdigit(static_cast<unsigned char>(literal[0]));
+           std::isalpha(static_cast<unsigned char>(literal[0]));
 }
 
 static bool is_special(const std::string& literal)
@@ -95,10 +94,10 @@ static bool is_special(const std::string& literal)
 ScalarConverter::Type ScalarConverter::detectType(const std::string& literal)
 {
     if (is_special(literal)) return TYPE_SPECIAL;
-    if (is_char(literal))    return TYPE_CHAR;
-    if (is_int(literal))     return TYPE_INT;
-    if (is_float(literal))   return TYPE_FLOAT;
-    if (is_double(literal))  return TYPE_DOUBLE;
+    if (is_char(literal)) return TYPE_CHAR;
+    if (is_int(literal)) return TYPE_INT;
+    if (is_float(literal)) return TYPE_FLOAT;
+    if (is_double(literal)) return TYPE_DOUBLE;
     return TYPE_INVALID;
 }
 
@@ -185,42 +184,67 @@ void ScalarConverter::convert(const std::string& literal)
         std::cout << "Error: Invalid input" << std::endl;
         return;
     }
+
     if (type == TYPE_SPECIAL)
     {
         printSpecial(literal);
         return;
     }
+
     if (type == TYPE_CHAR)
     {
         printFromChar(literal[0]);
         return;
     }
+
     if (type == TYPE_INT)
     {
         long value = std::strtol(literal.c_str(), &end, 10);
-        if (errno == ERANGE || *end != '\0' ||
-            value < std::numeric_limits<int>::min() || value > std::numeric_limits<int>::max())
+
+        if (*end != '\0')
+        {
             std::cout << "char: impossible\nint: impossible\nfloat: impossible\ndouble: impossible" << std::endl;
+            return;
+        }
+
+        if (errno == ERANGE ||
+            value < std::numeric_limits<int>::min() ||
+            value > std::numeric_limits<int>::max())
+        {
+            double asDouble = std::strtod(literal.c_str(), &end);
+            std::cout << "char: impossible" << std::endl;
+            std::cout << "int: impossible" << std::endl;
+            std::cout << std::fixed << std::setprecision(1);
+            std::cout << "float: " << static_cast<float>(asDouble) << "f" << std::endl;
+            std::cout << "double: " << asDouble << std::endl;
+        }
         else
             printFromInt(value);
+
         return;
     }
+
     if (type == TYPE_FLOAT)
     {
         double value = std::strtod(literal.c_str(), &end);
+
         if (errno == ERANGE || *end != 'f' || end[1] != '\0')
             std::cout << "char: impossible\nint: impossible\nfloat: impossible\ndouble: impossible" << std::endl;
         else
             printFromFloat(static_cast<float>(value));
+
         return;
     }
+
     if (type == TYPE_DOUBLE)
     {
         double value = std::strtod(literal.c_str(), &end);
+
         if (errno == ERANGE || *end != '\0')
             std::cout << "char: impossible\nint: impossible\nfloat: impossible\ndouble: impossible" << std::endl;
         else
             printFromDouble(value);
+
         return;
     }
 }
