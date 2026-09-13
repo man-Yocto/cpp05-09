@@ -1,8 +1,8 @@
-#pragma once
+#ifndef SPAN_HPP
+#define SPAN_HPP
 
 #include <vector>
 #include <algorithm>
-#include <iterator>
 #include <stdexcept>
 #include <limits>
 
@@ -16,22 +16,21 @@ public:
 
     void addNumber(int n);
 
-    int shortestSpan() const;
-    int longestSpan() const;
+    unsigned int shortestSpan() const;
+    unsigned int longestSpan() const;
 
     template <typename InputIterator>
     void addRange(InputIterator begin, InputIterator end)
     {
-        typename std::iterator_traits<InputIterator>::difference_type dist = std::distance(begin, end);
-        if (dist <= 0)
-            return;
-        if (_numbers.size() + static_cast<size_t>(dist) > _N)
+        std::vector<int> values(begin, end);
+        if (values.size() > _N - _numbers.size())
             throw std::runtime_error("Adding range would exceed Span capacity");
-        for (InputIterator it = begin; it != end; ++it)
-            _numbers.push_back(*it);
+        _numbers.insert(_numbers.end(), values.begin(), values.end());
     }
 
 private:
     unsigned int _N;
     std::vector<int> _numbers;
 };
+
+#endif
