@@ -1,18 +1,24 @@
 #include "PmergeMe.hpp"
-#include <cstdlib>
+#include <cctype>
 #include <climits>
 #include <ctime>
 
 static bool parseNumber(const char *text, int& number)
 {
-	char *end;
-	long value;
 	if (*text == '\0')
 		return false;
-	value = std::strtol(text, &end, 10);
-	if (*end != '\0' || value <= 0 || value > INT_MAX)
+	number = 0;
+	for (int i = 0; text[i] != '\0'; ++i)
+	{
+		if (!std::isdigit(static_cast<unsigned char>(text[i])))
+			return false;
+		int digit = text[i] - '0';
+		if (number > (INT_MAX - digit) / 10)
+			return false;
+		number = number * 10 + digit;
+	}
+	if (number == 0)
 		return false;
-	number = static_cast<int>(value);
 	return true;
 }
 

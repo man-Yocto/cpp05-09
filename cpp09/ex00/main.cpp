@@ -14,14 +14,7 @@ int main(int argc, char** argv)
     try
     {
         BitcoinExchange exchange;
-        try
-        {
-            exchange.loadDatabase("data.csv");
-        }
-        catch (const std::exception&)
-        {
-            exchange.loadDatabase("../cpp_09/cpp_09/data.csv");
-        }
+        exchange.loadDatabase("data.csv");
         exchange.processInputFile(argv[1]);
     }
     catch (const std::exception& error)
